@@ -1,7 +1,7 @@
-package app.javacode.menu;
+package main.java.app.javacode.menu;
 
-import app.javacode.service.AuthorService;
-import app.javacode.service.BookService;
+import main.java.app.javacode.service.AuthorService;
+import main.java.app.javacode.service.BookService;
 
 import java.util.Scanner;
 
