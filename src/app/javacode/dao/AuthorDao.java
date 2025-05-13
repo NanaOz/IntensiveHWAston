@@ -22,6 +22,7 @@ public class AuthorDao {
      * Сохраняет автора в базе данных.
      *
      * @param author объект автора для сохранения.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void save(Author author) throws SQLException {
@@ -43,7 +44,9 @@ public class AuthorDao {
      * Находит автора по его идентификатору.
      *
      * @param id идентификатор автора, которого нужно найти.
+     *
      * @return объект автора с указанным идентификатором, или null, если автор не найден.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public Author findById(int id) throws SQLException {
@@ -66,6 +69,7 @@ public class AuthorDao {
      * Обновляет данные автора в базе данных.
      *
      * @param author объект автора, содержащий обновленные данные.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void update(Author author) throws SQLException {
@@ -82,6 +86,7 @@ public class AuthorDao {
      * Удаляет автора из базы данных по его идентификатору.
      *
      * @param id идентификатор автора, которого нужно удалить.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void delete(int id) throws SQLException {
@@ -96,6 +101,7 @@ public class AuthorDao {
      * Находит всех авторов в базе данных.
      *
      * @return список авторов, хранящихся в базе данных.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public List<Author> findAll() throws SQLException {

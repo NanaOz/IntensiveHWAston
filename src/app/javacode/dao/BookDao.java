@@ -21,6 +21,7 @@ public class BookDao {
      * Сохраняет книгу в базе данных.
      *
      * @param book объект книги для сохранения.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void save(Book book) throws SQLException {
@@ -44,7 +45,9 @@ public class BookDao {
      * Находит книгу по ее идентификатору.
      *
      * @param id идентификатор книги, которую нужно найти.
+     *
      * @return объект книги с указанным идентификатором, или null, если книга не найдена.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public Book findById(int id) throws SQLException {
@@ -70,6 +73,7 @@ public class BookDao {
      * Обновляет данные книги в базе данных.
      *
      * @param book объект книги, содержащий обновленные данные.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void update(Book book) throws SQLException {
@@ -88,6 +92,7 @@ public class BookDao {
      * Удаляет книгу из базы данных по ее идентификатору.
      *
      * @param id идентификатор книги, которую нужно удалить.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void delete(int id) throws SQLException {
@@ -102,6 +107,7 @@ public class BookDao {
      * Находит все книги в базе данных.
      *
      * @return список книг, хранящихся в базе данных.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public List<Book> findAll() throws SQLException {
@@ -128,7 +134,9 @@ public class BookDao {
      * Находит все книги, написанные автором с указанным идентификатором.
      *
      * @param authorId идентификатор автора, чьи книги нужно найти.
+     *
      * @return список книг, написанных автором с указанным идентификатором.
+     *
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public List<Book> findByAuthorId(int authorId) throws SQLException {
