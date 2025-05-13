@@ -31,6 +31,24 @@ public class AuthorDao {
     }
 
     /**
+     * Маппит ResultSet в объект Author.
+     *
+     * @param rs ResultSet с данными автора
+     *
+     * @return объект Author
+     *
+     * @throws SQLException если возникла ошибка при работе с ResultSet
+     */
+    private Author mapResultSetToAuthor(ResultSet rs) throws SQLException {
+        Author author = new Author(
+                rs.getString("name"),
+                rs.getString("country")
+        );
+        author.setId(rs.getInt("id"));
+        return author;
+    }
+
+    /**
      * Сохраняет автора в базе данных.
      *
      * @param author объект автора для сохранения.
@@ -63,15 +81,13 @@ public class AuthorDao {
     public Author findById(int id) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_ID_SQL)) {
             stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                return new Author(
-                        rs.getString("name"),
-                        rs.getString("country")
-                );
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToAuthor(rs);
+                }
+                return null;
             }
-            return null;
         }
     }
 
@@ -119,12 +135,7 @@ public class AuthorDao {
              ResultSet rs = stmt.executeQuery(FIND_ALL_SQL)) {
 
             while (rs.next()) {
-                Author author = new Author(
-                        rs.getString("name"),
-                        rs.getString("country")
-                );
-                author.setId(rs.getInt("id"));
-                authors.add(author);
+                authors.add(mapResultSetToAuthor(rs));
             }
         }
         return authors;
