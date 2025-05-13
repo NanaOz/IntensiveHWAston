@@ -11,6 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookDao {
+    // SQL-запросы вынесены в константы
+    private static final String INSERT_SQL =
+            "INSERT INTO books (title, author_id, year, available) VALUES (?, ?, ?, ?)";
+    private static final String FIND_BY_ID_SQL =
+            "SELECT * FROM books WHERE id = ?";
+    private static final String UPDATE_SQL =
+            "UPDATE books SET title = ?, author_id = ?, year = ?, available = ? WHERE id = ?";
+    private static final String DELETE_SQL =
+            "DELETE FROM books WHERE id = ?";
+    private static final String FIND_ALL_SQL =
+            "SELECT b.*, a.name as author_name FROM books b JOIN authors a ON b.author_id = a.id";
+    private static final String FIND_BY_AUTHOR_ID_SQL =
+            "SELECT * FROM books WHERE author_id = ?";
+
     private final Connection connection;
 
     public BookDao(Connection connection) {
@@ -25,8 +39,7 @@ public class BookDao {
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void save(Book book) throws SQLException {
-        String sql = "INSERT INTO books (title, author_id, year, available) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, book.getTitle());
             stmt.setInt(2, book.getAuthorId());
             stmt.setInt(3, book.getYear());
@@ -51,8 +64,7 @@ public class BookDao {
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public Book findById(int id) throws SQLException {
-        String sql = "SELECT * FROM books WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_ID_SQL)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
@@ -77,8 +89,7 @@ public class BookDao {
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void update(Book book) throws SQLException {
-        String sql = "UPDATE books SET title = ?, author_id = ?, year = ?, available = ? WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(UPDATE_SQL)) {
             stmt.setString(1, book.getTitle());
             stmt.setInt(2, book.getAuthorId());
             stmt.setInt(3, book.getYear());
@@ -96,8 +107,7 @@ public class BookDao {
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM books WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(DELETE_SQL)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         }
@@ -112,10 +122,9 @@ public class BookDao {
      */
     public List<Book> findAll() throws SQLException {
         List<Book> books = new ArrayList<>();
-        String sql = "SELECT b.*, a.name as author_name FROM books b JOIN authors a ON b.author_id = a.id";
 
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery(FIND_ALL_SQL)) {
 
             while (rs.next()) {
                 Book book = new Book();
@@ -141,9 +150,8 @@ public class BookDao {
      */
     public List<Book> findByAuthorId(int authorId) throws SQLException {
         List<Book> books = new ArrayList<>();
-        String sql = "SELECT * FROM books WHERE author_id = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_AUTHOR_ID_SQL)) {
             stmt.setInt(1, authorId);
             ResultSet rs = stmt.executeQuery();
 

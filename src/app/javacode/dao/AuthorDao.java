@@ -14,6 +14,18 @@ import java.util.List;
 public class AuthorDao {
     private final Connection connection;
 
+    // SQL-запросы вынесены в константы
+    private static final String INSERT_SQL =
+            "INSERT INTO authors (name, country) VALUES (?, ?)";
+    private static final String FIND_BY_ID_SQL =
+            "SELECT * FROM authors WHERE id = ?";
+    private static final String UPDATE_SQL =
+            "UPDATE authors SET name = ?, country = ? WHERE id = ?";
+    private static final String DELETE_SQL =
+            "DELETE FROM authors WHERE id = ?";
+    private static final String FIND_ALL_SQL =
+            "SELECT * FROM authors";
+
     public AuthorDao(Connection connection) {
         this.connection = connection;
     }
@@ -26,8 +38,7 @@ public class AuthorDao {
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void save(Author author) throws SQLException {
-        String sql = "INSERT INTO authors (name, country) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, author.getName());
             stmt.setString(2, author.getCountry());
             stmt.executeUpdate();
@@ -50,8 +61,7 @@ public class AuthorDao {
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public Author findById(int id) throws SQLException {
-        String sql = "SELECT * FROM authors WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_ID_SQL)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
@@ -73,8 +83,7 @@ public class AuthorDao {
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void update(Author author) throws SQLException {
-        String sql = "UPDATE authors SET name = ?, country = ? WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(UPDATE_SQL)) {
             stmt.setString(1, author.getName());
             stmt.setString(2, author.getCountry());
             stmt.setInt(3, author.getId());
@@ -90,8 +99,7 @@ public class AuthorDao {
      * @throws SQLException если возникла ошибка при работе с базой данных.
      */
     public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM authors WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(DELETE_SQL)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         }
@@ -106,10 +114,9 @@ public class AuthorDao {
      */
     public List<Author> findAll() throws SQLException {
         List<Author> authors = new ArrayList<>();
-        String sql = "SELECT * FROM authors";
 
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery(FIND_ALL_SQL)) {
 
             while (rs.next()) {
                 Author author = new Author(
