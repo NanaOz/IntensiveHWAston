@@ -6,6 +6,9 @@ import app.javacode.service.AuthorService;
 import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * Отвечает за работу с меню авторов. Позволяет выполнять действия, такие как добавление, обновление, поиск и удаление авторов.
+ */
 public class AuthorMenu implements Menu {
     private final Scanner scanner;
     private final AuthorService authorService;
@@ -15,6 +18,9 @@ public class AuthorMenu implements Menu {
         this.authorService = authorService;
     }
 
+    /**
+     * Отображает меню авторов и обрабатывает выбор действий.
+     */
     @Override
     public void show() {
         while (true) {

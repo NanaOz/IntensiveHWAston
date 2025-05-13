@@ -7,6 +7,9 @@ import app.javacode.service.BookService;
 import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * Отвечает за работу с меню книг. Позволяет выполнять действия, такие как добавление, обновление, поиск и удаление книг.
+ */
 public class BookMenu implements Menu {
     private final Scanner scanner;
     private final BookService bookService;
@@ -18,6 +21,9 @@ public class BookMenu implements Menu {
         this.authorService = authorService;
     }
 
+    /**
+     * Отображает меню книг и обрабатывает выбор действий.
+     */
     @Override
     public void show() {
         while (true) {

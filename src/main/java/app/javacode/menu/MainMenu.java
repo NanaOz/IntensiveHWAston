@@ -5,6 +5,9 @@ import app.javacode.service.BookService;
 
 import java.util.Scanner;
 
+/**
+ * Представляет главное меню приложения. Позволяет пользователю управлять авторами и книгами.
+ */
 public class MainMenu implements Menu {
     private final Scanner scanner;
     private final AuthorMenu authorMenu;
@@ -16,6 +19,9 @@ public class MainMenu implements Menu {
         this.bookMenu = new BookMenu(bookService, authorService);
     }
 
+    /**
+     * Отображает главное меню и обрабатывает выбор действий.
+     */
     @Override
     public void show() {
         while (true) {
