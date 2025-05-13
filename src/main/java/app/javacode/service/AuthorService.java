@@ -3,11 +3,14 @@ package app.javacode.service;
 import app.javacode.connection.HibernateUtil;
 import app.javacode.dao.AuthorDao;
 import app.javacode.entity.Author;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 
 public class AuthorService {
+    private static final Logger logger = LoggerFactory.getLogger(AuthorService.class);
     private final AuthorDao authorDao;
 
     public AuthorService() {
@@ -19,7 +22,7 @@ public class AuthorService {
         author.setName(name);
         author.setCountry(country);
         authorDao.save(author);
-        System.out.println("Автор успешно добавлен с ID: " + author.getId());
+        logger.info("Автор успешно добавлен с ID: {}", author.getId());
     }
 
     public void showAllAuthors() {

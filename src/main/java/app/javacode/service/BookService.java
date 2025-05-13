@@ -4,11 +4,14 @@ import app.javacode.connection.HibernateUtil;
 import app.javacode.dao.BookDao;
 import app.javacode.entity.Author;
 import app.javacode.entity.Book;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 
 public class BookService {
+    private static final Logger logger = LoggerFactory.getLogger(BookService.class);
     private final BookDao bookDao;
 
     public BookService() {
@@ -24,6 +27,7 @@ public class BookService {
         book.getAuthor().setId(authorId);
 
         bookDao.save(book);
+        logger.info("Автор успешно добавлен с ID: {}", book.getId());
         System.out.println("Книга успешно добавлена с ID: " + book.getId());
     }
 
