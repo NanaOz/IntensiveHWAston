@@ -32,6 +32,19 @@ public class BookDao {
     }
 
     /**
+     * Маппит ResultSet в объект Book
+     */
+    private Book mapResultSetToBook(ResultSet rs) throws SQLException {
+        Book book = new Book();
+        book.setId(rs.getInt("id"));
+        book.setTitle(rs.getString("title"));
+        book.setAuthorId(rs.getInt("author_id"));
+        book.setYear(rs.getInt("year"));
+        book.setAvailable(rs.getBoolean("available"));
+        return book;
+    }
+
+    /**
      * Сохраняет книгу в базе данных.
      *
      * @param book объект книги для сохранения.
@@ -66,18 +79,10 @@ public class BookDao {
     public Book findById(int id) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_ID_SQL)) {
             stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                Book book = new Book();
-                book.setId(rs.getInt("id"));
-                book.setTitle(rs.getString("title"));
-                book.setAuthorId(rs.getInt("author_id"));
-                book.setYear(rs.getInt("year"));
-                book.setAvailable(rs.getBoolean("available"));
-                return book;
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? mapResultSetToBook(rs) : null;
             }
-            return null;
         }
     }
 
@@ -127,13 +132,7 @@ public class BookDao {
              ResultSet rs = stmt.executeQuery(FIND_ALL_SQL)) {
 
             while (rs.next()) {
-                Book book = new Book();
-                book.setId(rs.getInt("id"));
-                book.setTitle(rs.getString("title"));
-                book.setAuthorId(rs.getInt("author_id"));
-                book.setYear(rs.getInt("year"));
-                book.setAvailable(rs.getBoolean("available"));
-                books.add(book);
+                books.add(mapResultSetToBook(rs));
             }
         }
         return books;
@@ -153,16 +152,11 @@ public class BookDao {
 
         try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_AUTHOR_ID_SQL)) {
             stmt.setInt(1, authorId);
-            ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                Book book = new Book();
-                book.setId(rs.getInt("id"));
-                book.setTitle(rs.getString("title"));
-                book.setAuthorId(rs.getInt("author_id"));
-                book.setYear(rs.getInt("year"));
-                book.setAvailable(rs.getBoolean("available"));
-                books.add(book);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    books.add(mapResultSetToBook(rs));
+                }
             }
         }
         return books;
