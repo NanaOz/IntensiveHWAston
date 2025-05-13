@@ -1,9 +1,9 @@
-package main.java.app.javacode;
+package app.javacode;
 
-import main.java.app.javacode.connection.HibernateUtil;
-import main.java.app.javacode.menu.MainMenu;
-import main.java.app.javacode.service.AuthorService;
-import main.java.app.javacode.service.BookService;
+import app.javacode.connection.HibernateUtil;
+import app.javacode.menu.MainMenu;
+import app.javacode.service.AuthorService;
+import app.javacode.service.BookService;
 
 public class Main {
     public static void main(String[] args) {

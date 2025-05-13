@@ -1,4 +1,4 @@
-package main.java.app.javacode.menu;
+package app.javacode.menu;
 
 public interface Menu {
     void show();

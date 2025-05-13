@@ -1,8 +1,8 @@
-package main.java.app.javacode.service;
+package app.javacode.service;
 
-import main.java.app.javacode.connection.HibernateUtil;
-import main.java.app.javacode.dao.AuthorDao;
-import main.java.app.javacode.entity.Author;
+import app.javacode.connection.HibernateUtil;
+import app.javacode.dao.AuthorDao;
+import app.javacode.entity.Author;
 
 import java.util.List;
 import java.util.Optional;

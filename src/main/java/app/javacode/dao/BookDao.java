@@ -1,6 +1,6 @@
-package main.java.app.javacode.dao;
+package app.javacode.dao;
 
-import main.java.app.javacode.entity.Book;
+import app.javacode.entity.Book;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;

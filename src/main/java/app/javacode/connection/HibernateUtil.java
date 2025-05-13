@@ -1,16 +1,17 @@
-package main.java.app.javacode.connection;
+package app.javacode.connection;
 
-import main.java.app.javacode.entity.Author;
-import main.java.app.javacode.entity.Book;
+import app.javacode.entity.Author;
+import app.javacode.entity.Book;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
 
+import java.io.InputStream;
 import java.util.Properties;
 
 public class HibernateUtil {
+    private static final String HIBERNATE_PROPERTIES = "db.properties";
     private static SessionFactory sessionFactory;
 
     public static SessionFactory getSessionFactory() {
@@ -34,18 +35,15 @@ public class HibernateUtil {
 
     private static Configuration getConfiguration() {
         Configuration configuration = new Configuration();
-
-        Properties settings = new Properties();
-        settings.put(Environment.DRIVER, "org.postgresql.Driver");
-        settings.put(Environment.URL, "jdbc:postgresql://localhost:5432/testappaston");
-        settings.put(Environment.USER, "postgres");
-        settings.put(Environment.PASS, "0025");
-        settings.put(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
-        settings.put(Environment.SHOW_SQL, "true");
-        settings.put(Environment.FORMAT_SQL, "true");
-        settings.put(Environment.HBM2DDL_AUTO, "update");
-
-        configuration.setProperties(settings);
+        try (InputStream input = HibernateUtil.class.getClassLoader()
+                .getResourceAsStream(HIBERNATE_PROPERTIES)) {
+            Properties settings = new Properties();
+            settings.load(input);
+            configuration.setProperties(settings);
+            return configuration;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return configuration;
     }
 

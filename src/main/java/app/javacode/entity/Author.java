@@ -1,4 +1,4 @@
-package main.java.app.javacode.entity;
+package app.javacode.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
