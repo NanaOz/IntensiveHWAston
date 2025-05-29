@@ -1,0 +1,143 @@
+package app.javacode.dao;
+
+import app.javacode.entity.Author;
+
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AuthorDao {
+    private final Connection connection;
+
+    // SQL-запросы вынесены в константы
+    private static final String INSERT_SQL =
+            "INSERT INTO authors (name, country) VALUES (?, ?)";
+    private static final String FIND_BY_ID_SQL =
+            "SELECT * FROM authors WHERE id = ?";
+    private static final String UPDATE_SQL =
+            "UPDATE authors SET name = ?, country = ? WHERE id = ?";
+    private static final String DELETE_SQL =
+            "DELETE FROM authors WHERE id = ?";
+    private static final String FIND_ALL_SQL =
+            "SELECT * FROM authors";
+
+    public AuthorDao(Connection connection) {
+        this.connection = connection;
+    }
+
+    /**
+     * Маппит ResultSet в объект Author.
+     *
+     * @param rs ResultSet с данными автора
+     *
+     * @return объект Author
+     *
+     * @throws SQLException если возникла ошибка при работе с ResultSet
+     */
+    private Author mapResultSetToAuthor(ResultSet rs) throws SQLException {
+        Author author = new Author(
+                rs.getString("name"),
+                rs.getString("country")
+        );
+        author.setId(rs.getInt("id"));
+        return author;
+    }
+
+    /**
+     * Сохраняет автора в базе данных.
+     *
+     * @param author объект автора для сохранения.
+     *
+     * @throws SQLException если возникла ошибка при работе с базой данных.
+     */
+    public void save(Author author) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, author.getName());
+            stmt.setString(2, author.getCountry());
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    author.setId(rs.getInt(1));
+                }
+            }
+        }
+    }
+
+    /**
+     * Находит автора по его идентификатору.
+     *
+     * @param id идентификатор автора, которого нужно найти.
+     *
+     * @return объект автора с указанным идентификатором, или null, если автор не найден.
+     *
+     * @throws SQLException если возникла ошибка при работе с базой данных.
+     */
+    public Author findById(int id) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_ID_SQL)) {
+            stmt.setInt(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToAuthor(rs);
+                }
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Обновляет данные автора в базе данных.
+     *
+     * @param author объект автора, содержащий обновленные данные.
+     *
+     * @throws SQLException если возникла ошибка при работе с базой данных.
+     */
+    public void update(Author author) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(UPDATE_SQL)) {
+            stmt.setString(1, author.getName());
+            stmt.setString(2, author.getCountry());
+            stmt.setInt(3, author.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Удаляет автора из базы данных по его идентификатору.
+     *
+     * @param id идентификатор автора, которого нужно удалить.
+     *
+     * @throws SQLException если возникла ошибка при работе с базой данных.
+     */
+    public void delete(int id) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(DELETE_SQL)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Находит всех авторов в базе данных.
+     *
+     * @return список авторов, хранящихся в базе данных.
+     *
+     * @throws SQLException если возникла ошибка при работе с базой данных.
+     */
+    public List<Author> findAll() throws SQLException {
+        List<Author> authors = new ArrayList<>();
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(FIND_ALL_SQL)) {
+
+            while (rs.next()) {
+                authors.add(mapResultSetToAuthor(rs));
+            }
+        }
+        return authors;
+    }
+}
