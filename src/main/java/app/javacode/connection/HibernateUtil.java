@@ -1,56 +1,56 @@
 package app.javacode.connection;
 
-import app.javacode.entity.Author;
-import app.javacode.entity.Book;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
-import java.io.InputStream;
+import javax.sql.DataSource;
 import java.util.Properties;
 
+@Configuration
+@PropertySource("classpath:db.properties")
 public class HibernateUtil {
-    private static final String HIBERNATE_PROPERTIES = "db.properties";
-    private static SessionFactory sessionFactory;
+    @Autowired
+    private Environment env;
 
-    public static SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            try {
-                Configuration configuration = getConfiguration();
-                configuration.addAnnotatedClass(Author.class);
-                configuration.addAnnotatedClass(Book.class);
+    @Bean
+    public DataSource dataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(env.getProperty("hibernate.connection.driver_class"));
+        dataSource.setUrl(env.getProperty("hibernate.connection.url"));
+        dataSource.setUsername(env.getProperty("hibernate.connection.username"));
+        dataSource.setPassword(env.getProperty("hibernate.connection.password"));
+        return dataSource;
+    }
 
-                StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                        .applySettings(configuration.getProperties())
-                        .build();
-
-                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    @Bean
+    public LocalSessionFactoryBean sessionFactory() {
+        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+        sessionFactory.setDataSource(dataSource());
+        sessionFactory.setPackagesToScan("app.javacode.entity");
+        sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
     }
 
-    private static Configuration getConfiguration() {
-        Configuration configuration = new Configuration();
-        try (InputStream input = HibernateUtil.class.getClassLoader()
-                .getResourceAsStream(HIBERNATE_PROPERTIES)) {
-            Properties settings = new Properties();
-            settings.load(input);
-            configuration.setProperties(settings);
-            return configuration;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return configuration;
+    private Properties hibernateProperties() {
+        Properties properties = new Properties();
+        properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
+        properties.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+        properties.put("hibernate.format_sql", env.getProperty("hibernate.format_sql"));
+        properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+        return properties;
     }
 
-    public static void shutdown() {
-        if (sessionFactory != null) {
-            sessionFactory.close();
-        }
+    @Bean
+    public HibernateTransactionManager transactionManager() {
+        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
+        transactionManager.setSessionFactory(sessionFactory().getObject());
+        return transactionManager;
     }
 }
 

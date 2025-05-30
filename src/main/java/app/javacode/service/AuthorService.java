@@ -1,45 +1,39 @@
 package app.javacode.service;
 
-import app.javacode.connection.HibernateUtil;
-import app.javacode.dao.AuthorDao;
 import app.javacode.entity.Author;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import app.javacode.repository.AuthorRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
+@Service
+@Transactional
 public class AuthorService {
-    private static final Logger logger = LoggerFactory.getLogger(AuthorService.class);
-    private final AuthorDao authorDao;
+    private final AuthorRepository authorRepository;
 
-    public AuthorService() {
-        this.authorDao = new AuthorDao(HibernateUtil.getSessionFactory());
+    public AuthorService(AuthorRepository authorRepository) {
+        this.authorRepository = authorRepository;
     }
 
-    public void createAuthor(String name, String country) {
-        Author author = new Author();
-        author.setName(name);
-        author.setCountry(country);
-        authorDao.save(author);
-        logger.info("Автор успешно добавлен с ID: {}", author.getId());
+    public List<Author> findAll() {
+        return authorRepository.findAll();
     }
 
-    public void showAllAuthors() {
-        List<Author> authors = authorDao.findAll();
-        System.out.println("\n=== Список авторов ===");
-        authors.forEach(System.out::println);
+    public Author findById(Long id) {
+        return authorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Автор не найден с id: " + id));
     }
 
-    public Optional<Author> findById(int id) {
-        return authorDao.findById(id);
+    public Author save(Author author) {
+        return authorRepository.save(author);
     }
 
-    public void update(Author author) {
-        authorDao.update(author);
+    public void deleteById(Long id) {
+        authorRepository.deleteById(id);
     }
 
-    public void delete(int id) {
-        authorDao.delete(id);
+    public List<Author> searchByName(String name) {
+        return authorRepository.findByNameContainingIgnoreCase(name);
     }
 }

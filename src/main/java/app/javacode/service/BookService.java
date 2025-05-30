@@ -1,70 +1,55 @@
 package app.javacode.service;
 
-import app.javacode.connection.HibernateUtil;
-import app.javacode.dao.BookDao;
 import app.javacode.entity.Author;
 import app.javacode.entity.Book;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import app.javacode.repository.BookRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
+@Service
+@Transactional
 public class BookService {
-    private static final Logger logger = LoggerFactory.getLogger(BookService.class);
-    private final BookDao bookDao;
+    private final BookRepository bookRepository;
+    private final AuthorService authorService;
 
-    public BookService() {
-        this.bookDao = new BookDao(HibernateUtil.getSessionFactory());
+    public BookService(BookRepository bookRepository, AuthorService authorService) {
+        this.bookRepository = bookRepository;
+        this.authorService = authorService;
     }
 
-    public void createBook(String title, int authorId, int year, boolean available) {
-        Book book = new Book();
-        book.setTitle(title);
-        book.setYear(year);
-        book.setAvailable(available);
-        book.setAuthor(new Author());
-        book.getAuthor().setId(authorId);
-
-        bookDao.save(book);
-        logger.info("Автор успешно добавлен с ID: {}", book.getId());
-        System.out.println("Книга успешно добавлена с ID: " + book.getId());
+    public List<Book> findAll() {
+        return bookRepository.findAll();
     }
 
-    public Optional<Book> findById(int id) {
-        return bookDao.findById(id);
+    public Book findById(Long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Книга не найдена с id: " + id));
     }
 
-    public void showAllBooks() {
-        List<Book> books = bookDao.findAll();
-        System.out.println("\n=== Список книг ===");
-        books.forEach(this::printBookDetails);
+    public Book save(Book book) {
+        if (book.getAuthor() == null || book.getAuthor().getId() == 0) {
+            throw new RuntimeException("Нужен автор");
+        }
+        Author author = authorService.findById(book.getAuthor().getId());
+        book.setAuthor(author);
+        return bookRepository.save(book);
     }
 
-    public void showBooksByAuthor(int authorId) {
-        List<Book> books = bookDao.findByAuthorId(authorId);
-        System.out.println("\n=== Книги автора ===");
-        books.forEach(this::printBookDetails);
+    public void deleteById(Long id) {
+        bookRepository.deleteById(id);
     }
 
-    public void update(Book book) {
-        bookDao.update(book);
-        System.out.println("Книга успешно обновлена");
+    public List<Book> findByAuthorId(Long authorId) {
+        return bookRepository.findByAuthorId(authorId);
     }
 
-    public void deleteBook(int id) {
-        bookDao.delete(id);
-        System.out.println("Книга успешно удалена");
+    public List<Book> findAvailableBooks() {
+        return bookRepository.findByAvailable(true);
     }
 
-    private void printBookDetails(Book book) {
-        String details = "ID: " + book.getId() +
-                ", Название: " + book.getTitle() +
-                ", Автор: " + book.getAuthor().getName() +
-                " (ID: " + book.getAuthor().getId() + "), " +
-                "Год: " + book.getYear() +
-                ", Доступна: " + (book.isAvailable() ? "Да" : "Нет");
-
-        System.out.println(details);
+    public List<Book> searchByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 }
